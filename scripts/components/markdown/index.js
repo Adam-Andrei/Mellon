@@ -15,6 +15,21 @@ export function createMarkdownDock({ onImport }) {
   textarea.spellcheck = false;
   textarea.rows = 8;
 
+  textarea.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+
+    event.preventDefault();
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const value = textarea.value;
+    const before = value.slice(0, start);
+    const after = value.slice(end);
+
+    textarea.value = `${before}\t${after}`;
+    textarea.selectionStart = start + 1;
+    textarea.selectionEnd = start + 1;
+  });
+
   const errorEl = document.createElement('p');
   errorEl.className = 'md-dock__error';
   errorEl.hidden = true;

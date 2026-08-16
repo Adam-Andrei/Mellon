@@ -41,7 +41,8 @@ function handleAddCard(data) {
 }
 
 function handleImportMarkdown(parsedCards) {
-  // Normalize imported card columns: prefer preset columns, then existing custom columns
+  // Normalize imported card columns: prefer preset columns, then existing custom columns,
+  // and create a new custom column when import text uses a new heading.
   const presetMap = {
     todo: 'todo',
     doing: 'doing',
@@ -59,17 +60,23 @@ function handleImportMarkdown(parsedCards) {
 
   const normalized = parsedCards.map((pc) => {
     if (!pc || !pc.column) return pc;
+
     const col = String(pc.column).trim();
     const lower = col.toLowerCase();
-    // If matches preset label names or keys, map to preset id
+
     if (presetMap[lower]) return { ...pc, column: presetMap[lower] };
-    // If matches custom label, map to that custom id
-    if (customLabelMap[lower]) return { ...pc, column: customLabelMap[lower] };
-    // Also check uppercase preset labels (e.g., header text "TODO") by comparing against known labels
-    // If not matched, return as-is (will create a new custom column if you choose to)
-    return pc;
+
+    const existingCustomId = customLabelMap[lower];
+    if (existingCustomId) return { ...pc, column: existingCustomId };
+
+    const created = addCustomColumn(col);
+    addColumnToDOM(created);
+    customLabelMap[lower] = created.id;
+    return { ...pc, column: created.id };
   });
 
+  renderForms();
+  initDropZones();
   cards = mergeUrlCards(cards, normalized);
   saveAndRender();
 }

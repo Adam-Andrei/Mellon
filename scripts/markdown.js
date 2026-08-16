@@ -47,13 +47,7 @@ export function parseMarkdown(text) {
     const headerMatch = line.match(HEADER_RE);
     if (headerMatch) {
       flushCard();
-      const key = headerMatch[1].toUpperCase();
-      if (!COLUMN_MAP[key]) {
-        errors.push(`Line ${lineNum}: unknown column "${headerMatch[1]}"`);
-        currentColumn = null;
-        continue;
-      }
-      currentColumn = COLUMN_MAP[key];
+      currentColumn = headerMatch[1].trim();
       continue;
     }
 
