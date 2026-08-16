@@ -13,11 +13,11 @@ const BULLET_RE = /^([+\-*])\s+(.*)$/;
 const HEADER_RE = /^#\s+(\S+)\s*$/;
 
 function isNestedLine(line) {
-  return /^\t/.test(line) || /^ {2,}\S/.test(line);
+  return /^\t/.test(line);
 }
 
 function parseBulletContent(line) {
-  const trimmed = line.trimStart();
+  const trimmed = line.replace(/^\t/, '').trimStart();
   const match = trimmed.match(BULLET_RE);
   if (!match) return null;
   return match[2].trim();
@@ -56,7 +56,7 @@ export function parseMarkdown(text) {
       continue;
     }
 
-    const content = parseBulletContent(isNestedLine(line) ? line.replace(/^(\t|\s{2,})/, '') : line);
+    const content = parseBulletContent(isNestedLine(line) ? line.replace(/^\t/, '') : line);
     if (content === null) {
       errors.push(`Line ${lineNum}: invalid format — use +, -, or * for items`);
       continue;
