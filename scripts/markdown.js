@@ -23,6 +23,13 @@ function parseBulletContent(line) {
   return match[2].trim();
 }
 
+function normalizeDescription(value) {
+  return String(value ?? '')
+    .replace(/\\\r?\n/g, '\n')
+    .replace(/\\\s*$/g, '')
+    .replace(/\r\n/g, '\n');
+}
+
 export function parseMarkdown(text) {
   const lines = text.split(/\r?\n/);
   const cards = [];
@@ -36,6 +43,18 @@ export function parseMarkdown(text) {
       cards.push({ ...currentCard, column: currentColumn });
     }
     currentCard = null;
+  }
+
+  function appendDescription(content) {
+    const normalized = normalizeDescription(content);
+    if (!normalized) return;
+
+    if (currentCard.description) {
+      currentCard.description = `${currentCard.description}\n${normalized}`;
+      return;
+    }
+
+    currentCard.description = normalized;
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -80,11 +99,7 @@ export function parseMarkdown(text) {
       }
       currentCard.dueDate = content;
     } else {
-      if (currentCard.description) {
-        errors.push(`Line ${lineNum}: card already has a description`);
-        continue;
-      }
-      currentCard.description = content;
+      appendDescription(content);
     }
   }
 
@@ -113,7 +128,15 @@ export function cardsToMarkdown(cards) {
     sections.push(`# ${col.toUpperCase()}`);
     for (const card of colCards) {
       sections.push(`+ ${card.title}`);
-      if (card.description) sections.push(`\t+ ${card.description}`);
+      if (card.description) {
+        const lines = String(card.description).split(/\r?\n/);
+        for (let i = 0; i < lines.length; i += 1) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          const suffix = i < lines.length - 1 ? '\\' : '';
+          sections.push(`\t+ ${line}${suffix}`);
+        }
+      }
       if (card.dueDate) sections.push(`\t* ${card.dueDate}`);
     }
     sections.push('');

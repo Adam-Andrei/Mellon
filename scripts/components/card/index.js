@@ -43,7 +43,10 @@ export function createCard(card, { context = 'board', onArchive, onDiscard, onRe
   if (card.description) {
     const desc = document.createElement('p');
     desc.className = 'card__desc';
-    desc.textContent = card.description;
+    desc.textContent = String(card.description)
+      .replace(/\\\r?\n/g, '\n')
+      .replace(/\\\s*$/g, '')
+      .replace(/\r\n/g, '\n');
     el.appendChild(desc);
   }
 
