@@ -9,3 +9,7 @@ Kanban app no login required
   
 - just copy this part ?b=H4sIAAAAAAAA...
 
+# How To use MD
+
+<img width="846" height="337" alt="image" src="https://github.com/user-attachments/assets/7d2075b1-610d-4d43-8e86-e37cbb41a564" />
+<img width="569" height="180" alt="image" src="https://github.com/user-attachments/assets/fc155f5b-d6d7-4d9c-9cd3-3ebcce0ed28d" />
