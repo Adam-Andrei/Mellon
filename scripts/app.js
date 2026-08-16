@@ -41,7 +41,36 @@ function handleAddCard(data) {
 }
 
 function handleImportMarkdown(parsedCards) {
-  cards = mergeUrlCards(cards, parsedCards);
+  // Normalize imported card columns: prefer preset columns, then existing custom columns
+  const presetMap = {
+    todo: 'todo',
+    doing: 'doing',
+    done: 'done',
+    discarded: 'discarded',
+    archived: 'archived',
+  };
+
+  const customs = getCustomColumns() || [];
+  const customLabelMap = {};
+  for (const c of customs) {
+    if (!c || !c.label) continue;
+    customLabelMap[String(c.label).trim().toLowerCase()] = c.id;
+  }
+
+  const normalized = parsedCards.map((pc) => {
+    if (!pc || !pc.column) return pc;
+    const col = String(pc.column).trim();
+    const lower = col.toLowerCase();
+    // If matches preset label names or keys, map to preset id
+    if (presetMap[lower]) return { ...pc, column: presetMap[lower] };
+    // If matches custom label, map to that custom id
+    if (customLabelMap[lower]) return { ...pc, column: customLabelMap[lower] };
+    // Also check uppercase preset labels (e.g., header text "TODO") by comparing against known labels
+    // If not matched, return as-is (will create a new custom column if you choose to)
+    return pc;
+  });
+
+  cards = mergeUrlCards(cards, normalized);
   saveAndRender();
 }
 
@@ -222,12 +251,18 @@ function initTabs() {
 function initClear() {
   document.getElementById('clear-btn').addEventListener('click', () => {
     const confirmed = confirm(
-      'Warning: This will permanently wipe out everything on all lists (Todo, Doing, Done, Discarded, and Archived).\n\nThis cannot be undone. Continue?'
+      'Warning: This will permanently wipe out everything on all lists (Todo, Doing, Done, Discarded, Archived, and any custom columns).\n\nThis cannot be undone. Continue?'
     );
     if (!confirmed) return;
 
     cards = [];
     clearState();
+
+    const board = document.getElementById('board-tab');
+    if (board) {
+      board.querySelectorAll('.column[data-column^="custom_"]').forEach((col) => col.remove());
+    }
+
     render();
     switchTab('board');
   });

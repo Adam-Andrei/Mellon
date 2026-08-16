@@ -21,6 +21,7 @@ export function setState(cards) {
 
 export function clearState() {
   localStorage.removeItem(STORAGE_KEY);
+  clearCustomColumns();
 }
 
 export function createCard({ title, description, dueDate, column }) {
