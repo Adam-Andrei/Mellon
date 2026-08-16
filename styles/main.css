@@ -239,7 +239,6 @@ body {
 }
 
 .column__title {
-  flex: 1;
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
