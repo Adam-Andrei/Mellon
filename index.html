@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melon — Kanban Board</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header__title">Melon</h1>
+    <nav class="header__tabs">
+      <button class="tab tab--active" data-tab="board">Board</button>
+      <button class="tab" data-tab="archive">Archive</button>
+      <button class="btn btn--clear" id="clear-btn" title="Clear all cards from every list">Clear</button>
+    </nav>
+    <button class="btn btn--share" id="share-btn">Share</button>
+  </header>
+
+  <aside class="share-panel" id="share-panel" hidden>
+    <div class="share-panel__inner">
+      <label class="share-panel__label" for="share-url">Share link</label>
+      <div class="share-panel__row">
+        <input class="share-panel__input" id="share-url" type="text" readonly>
+        <button class="btn" id="copy-btn">Copy link</button>
+      </div>
+      <div class="share-panel__qr" id="qr-container"></div>
+      <button class="btn btn--ghost" id="close-share-btn">Close</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="board" id="board-tab">
+      <div class="column" data-column="todo">
+        <h2 class="column__title">Todo</h2>
+        <div class="column__form" data-form="todo"></div>
+        <div class="column__cards" data-cards="todo"></div>
+      </div>
+      <div class="column" data-column="doing">
+        <h2 class="column__title">Doing</h2>
+        <div class="column__form" data-form="doing"></div>
+        <div class="column__cards" data-cards="doing"></div>
+      </div>
+      <div class="column" data-column="done">
+        <h2 class="column__title">Done</h2>
+        <div class="column__form" data-form="done"></div>
+        <div class="column__cards" data-cards="done"></div>
+      </div>
+      <div class="column column--discarded" data-column="discarded">
+        <h2 class="column__title">Discarded</h2>
+        <div class="column__form" data-form="discarded"></div>
+        <div class="column__cards" data-cards="discarded"></div>
+      </div>
+    </section>
+
+    <section class="archive" id="archive-tab" hidden>
+      <div class="column column--archived" data-column="archived">
+        <h2 class="column__title">Archived</h2>
+        <div class="column__cards" data-cards="archived"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="md-dock-root"></div>
+
+  <script type="module" src="scripts/app.js"></script>
+</body>
+</html>
