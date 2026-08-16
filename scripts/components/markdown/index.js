@@ -5,18 +5,9 @@ export function createMarkdownDock({ onImport }) {
   dock.className = 'md-dock';
   dock.id = 'md-dock';
 
-  const toggle = document.createElement('button');
-  toggle.type = 'button';
-  toggle.className = 'md-dock__toggle';
-  toggle.setAttribute('aria-expanded', 'false');
-  toggle.innerHTML = `
-    <span class="md-dock__icon" aria-hidden="true">+</span>
-    <span class="md-dock__label">Paste Markdown…</span>
-  `;
-
   const panel = document.createElement('div');
   panel.className = 'md-dock__panel';
-  panel.hidden = true;
+  panel.hidden = false;
 
   const textarea = document.createElement('textarea');
   textarea.className = 'md-dock__textarea';
@@ -43,37 +34,17 @@ export function createMarkdownDock({ onImport }) {
 
   actions.append(importBtn, closeBtn);
   panel.append(textarea, errorEl, actions);
-  dock.append(toggle, panel);
+  dock.append(panel);
 
   function showError(msg) {
     errorEl.textContent = msg;
     errorEl.hidden = !msg;
   }
 
-  function open() {
-    panel.hidden = false;
-    toggle.hidden = true;
-    toggle.setAttribute('aria-expanded', 'true');
-    showError('');
-    textarea.focus();
-  }
-
-  function close() {
-    if (panel.hidden) return;
-    panel.classList.add('md-dock__panel--closing');
-    const onAnim = () => {
-      panel.classList.remove('md-dock__panel--closing');
-      panel.hidden = true;
-      toggle.hidden = false;
-      toggle.setAttribute('aria-expanded', 'false');
-      panel.removeEventListener('animationend', onAnim);
-    };
-    panel.addEventListener('animationend', onAnim);
-    showError('');
-  }
-
-  toggle.addEventListener('click', open);
-  closeBtn.addEventListener('click', close);
+  closeBtn.addEventListener('click', () => {
+    // signal to host that the dock should be hidden entirely
+    dock.dispatchEvent(new CustomEvent('md-close'));
+  });
 
   importBtn.addEventListener('click', () => {
     const text = textarea.value.trim();
@@ -90,7 +61,8 @@ export function createMarkdownDock({ onImport }) {
       onImport(parsed);
       textarea.value = '';
       showError('');
-      close();
+      // signal to host to hide the dock
+      dock.dispatchEvent(new CustomEvent('md-close'));
     } catch (err) {
       showError(err.message);
     }

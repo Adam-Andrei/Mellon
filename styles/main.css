@@ -424,6 +424,29 @@ body {
   z-index: 200;
 }
 
+/* Floating toggle button for markdown dock */
+.md-toggle-btn {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 350;
+  cursor: pointer;
+}
+
+.md-toggle-btn .md-dock__icon {
+  background: transparent;
+  color: var(--text);
+}
+
 .md-dock {
   display: flex;
   flex-direction: column;
@@ -582,12 +605,4 @@ body {
   gap: 0.5rem;
 }
 
-/* Markdown dock slide-out animation */
-.md-dock__panel--closing {
-  animation: mdSlideOut 220ms ease-in forwards;
-}
-
-@keyframes mdSlideOut {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(120%); opacity: 0; }
-}
+/* (removed slide animation for markdown dock) */

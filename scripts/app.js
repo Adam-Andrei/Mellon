@@ -261,7 +261,29 @@ function initShare() {
 
 function initMarkdownDock() {
   const root = document.getElementById('md-dock-root');
-  root.appendChild(createMarkdownDock({ onImport: handleImportMarkdown }));
+  const dock = createMarkdownDock({ onImport: handleImportMarkdown });
+  root.appendChild(dock);
+
+  // Close handler from dock — hide the entire root
+  dock.addEventListener('md-close', () => {
+    root.hidden = true;
+    const toggle = document.getElementById('md-toggle-btn');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  });
+
+  // Global toggle button to show/hide the dock
+  const mdToggle = document.getElementById('md-toggle-btn');
+  if (mdToggle) {
+    mdToggle.addEventListener('click', () => {
+      const nowHidden = root.hidden;
+      root.hidden = !nowHidden;
+      mdToggle.setAttribute('aria-expanded', String(!nowHidden));
+      if (!nowHidden) return;
+      // focus textarea when opening
+      const ta = root.querySelector('.md-dock__textarea');
+      if (ta) ta.focus();
+    });
+  }
 }
 
 async function initFromUrl() {
