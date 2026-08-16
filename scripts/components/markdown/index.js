@@ -59,9 +59,16 @@ export function createMarkdownDock({ onImport }) {
   }
 
   function close() {
-    panel.hidden = true;
-    toggle.hidden = false;
-    toggle.setAttribute('aria-expanded', 'false');
+    if (panel.hidden) return;
+    panel.classList.add('md-dock__panel--closing');
+    const onAnim = () => {
+      panel.classList.remove('md-dock__panel--closing');
+      panel.hidden = true;
+      toggle.hidden = false;
+      toggle.setAttribute('aria-expanded', 'false');
+      panel.removeEventListener('animationend', onAnim);
+    };
+    panel.addEventListener('animationend', onAnim);
     showError('');
   }
 

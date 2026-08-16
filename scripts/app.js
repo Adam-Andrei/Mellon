@@ -10,6 +10,9 @@ import {
   restoreCard,
   mergeUrlCards,
   getCardsByColumn,
+  getCustomColumns,
+  setCustomColumns,
+  addCustomColumn,
 } from './state.js';
 import { BOARD_COLUMNS, parseUrlParams, buildShareUrl, stripUrlParams, hasUrlParams } from './url.js';
 import { createForm } from './components/form/index.js';
@@ -94,7 +97,7 @@ function renderColumn(column, context = 'board') {
 }
 
 function initDropZones() {
-  for (const column of BOARD_COLUMNS) {
+  for (const column of getColumns()) {
     const cardsContainer = document.querySelector(`[data-cards="${column}"]`);
     if (cardsContainer) {
       setupDropZone(cardsContainer, column, handleMove);
@@ -103,7 +106,7 @@ function initDropZones() {
 }
 
 function renderForms() {
-  for (const column of BOARD_COLUMNS) {
+  for (const column of getColumns()) {
     const formContainer = document.querySelector(`[data-form="${column}"]`);
     if (!formContainer) continue;
     formContainer.innerHTML = '';
@@ -118,10 +121,87 @@ function renderForms() {
 }
 
 function render() {
-  for (const column of BOARD_COLUMNS) {
+  for (const column of getColumns()) {
     renderColumn(column, 'board');
   }
   renderColumn('archived', 'archive');
+}
+
+function getColumns() {
+  const customs = getCustomColumns() || [];
+  const customIds = customs.map((c) => c.id);
+  return [...BOARD_COLUMNS, ...customIds];
+}
+
+function addColumnToDOM(col) {
+  if (!col || !col.id) return;
+  const existing = document.querySelector(`[data-column="${col.id}"]`);
+  if (existing) return;
+  const board = document.getElementById('board-tab');
+  const el = document.createElement('div');
+  el.className = 'column';
+  el.setAttribute('data-column', col.id);
+  el.innerHTML = `
+    <h2 class="column__title">${col.label}</h2>
+    <div class="column__form" data-form="${col.id}"></div>
+    <div class="column__cards" data-cards="${col.id}"></div>
+  `;
+  board.appendChild(el);
+}
+
+function ensureCustomColumnsInDOM() {
+  const customs = getCustomColumns() || [];
+  for (const c of customs) addColumnToDOM(c);
+}
+
+function initCustomTab() {
+  const addBtn = document.getElementById('add-col-btn');
+  const pop = document.getElementById('add-column-popover');
+  const input = document.getElementById('new-col-name');
+  const createBtn = document.getElementById('create-col-btn');
+  const cancelBtn = document.getElementById('cancel-col-btn');
+
+  if (!addBtn || !pop || !input || !createBtn || !cancelBtn) return;
+
+  function open() {
+    pop.hidden = false;
+    input.value = '';
+    setTimeout(() => input.focus(), 0);
+  }
+
+  function close() {
+    pop.hidden = true;
+    input.value = '';
+  }
+
+  addBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    open();
+  });
+
+  cancelBtn.addEventListener('click', close);
+
+  createBtn.addEventListener('click', () => {
+    const name = (input.value || '').trim();
+    if (!name) return alert('Enter a column name');
+    const existing = getColumns();
+    // check id collision
+    const slug = String(name).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const id = `custom_${slug || Date.now().toString(36)}`;
+    if (existing.includes(id)) return alert('A column with a similar name already exists');
+    const entry = addCustomColumn(name);
+    addColumnToDOM(entry);
+    renderForms();
+    initDropZones();
+    render();
+    close();
+  });
+
+  // close when clicking outside
+  document.addEventListener('click', (ev) => {
+    if (pop.hidden) return;
+    if (!pop.contains(ev.target) && ev.target !== addBtn) close();
+  });
 }
 
 function switchTab(tab) {
@@ -204,6 +284,7 @@ async function initFromUrl() {
 async function init() {
   cards = getState();
   await initFromUrl();
+  ensureCustomColumnsInDOM();
   renderForms();
   initDropZones();
   render();
@@ -211,6 +292,7 @@ async function init() {
   initClear();
   initShare();
   initMarkdownDock();
+  initCustomTab();
 }
 
 init();

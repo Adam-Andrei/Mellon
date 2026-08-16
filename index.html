@@ -14,6 +14,9 @@
       <button class="tab" data-tab="archive">Archive</button>
       <button class="btn btn--clear" id="clear-btn" title="Clear all cards from every list">Clear</button>
     </nav>
+    <button class="btn btn--add-tab" id="add-col-btn" title="Add column">
+      <span class="md-dock__icon" aria-hidden="true">+</span>
+    </button>
     <button class="btn btn--share" id="share-btn">Share</button>
   </header>
 
@@ -28,6 +31,17 @@
       <button class="btn btn--ghost" id="close-share-btn">Close</button>
     </div>
   </aside>
+
+    <div class="add-col-popover" id="add-column-popover" hidden>
+      <div class="add-col-popover__inner">
+        <label for="new-col-name" class="add-col-popover__label">Column name</label>
+        <input id="new-col-name" class="add-col-popover__input" type="text" placeholder="Backlog">
+        <div class="add-col-popover__actions">
+          <button class="btn" id="cancel-col-btn">Cancel</button>
+          <button class="btn btn--share" id="create-col-btn">Create</button>
+        </div>
+      </div>
+    </div>
 
   <main class="main">
     <section class="board" id="board-tab">

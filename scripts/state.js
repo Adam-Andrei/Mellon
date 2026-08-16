@@ -76,3 +76,38 @@ export function getCardsByColumn(cards, column) {
     .filter((c) => c.column === column)
     .sort((a, b) => a.createdAt - b.createdAt);
 }
+
+// Custom columns persistence (stored as array of { id, label })
+const COLUMNS_KEY = 'melon-columns';
+
+export function getCustomColumns() {
+  try {
+    const raw = localStorage.getItem(COLUMNS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed;
+  } catch {
+    return [];
+  }
+}
+
+export function setCustomColumns(cols) {
+  try {
+    localStorage.setItem(COLUMNS_KEY, JSON.stringify(cols));
+  } catch {}
+}
+
+export function addCustomColumn(label) {
+  const cols = getCustomColumns();
+  const slug = String(label || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const id = `custom_${slug || Date.now().toString(36)}`;
+  const entry = { id, label: String(label).trim() };
+  cols.push(entry);
+  setCustomColumns(cols);
+  return entry;
+}
+
+export function clearCustomColumns() {
+  localStorage.removeItem(COLUMNS_KEY);
+}
