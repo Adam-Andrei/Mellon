@@ -231,7 +231,15 @@ body {
 .column[data-column="discarded"] .column__title { border-left-color: var(--discarded-accent); }
 .column[data-column="archived"] .column__title { border-left-color: var(--archived-accent); }
 
+.column__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .column__title {
+  flex: 1;
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -239,6 +247,11 @@ body {
   color: var(--text-muted);
   padding-left: 0.5rem;
   border-left: 3px solid var(--border);
+}
+
+.column__delete {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .column__cards {

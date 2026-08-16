@@ -13,6 +13,7 @@ import {
   getCustomColumns,
   setCustomColumns,
   addCustomColumn,
+  deleteCustomColumn,
 } from './state.js';
 import { BOARD_COLUMNS, parseUrlParams, buildShareUrl, stripUrlParams, hasUrlParams } from './url.js';
 import { createForm } from './components/form/index.js';
@@ -177,11 +178,49 @@ function addColumnToDOM(col) {
   const el = document.createElement('div');
   el.className = 'column';
   el.setAttribute('data-column', col.id);
-  el.innerHTML = `
-    <h2 class="column__title">${col.label}</h2>
-    <div class="column__form" data-form="${col.id}"></div>
-    <div class="column__cards" data-cards="${col.id}"></div>
-  `;
+
+  const titleWrap = document.createElement('div');
+  titleWrap.className = 'column__header';
+
+  const title = document.createElement('h2');
+  title.className = 'column__title';
+  title.textContent = col.label;
+
+  titleWrap.appendChild(title);
+
+  if (String(col.id).startsWith('custom_')) {
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'btn btn--clear btn--small column__delete';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.setAttribute('aria-label', `Delete custom column ${col.label}`);
+    deleteBtn.addEventListener('click', () => {
+      const confirmed = confirm(`Delete "${col.label}" and all cards in this custom column? This cannot be undone.`);
+      if (!confirmed) return;
+
+      deleteCustomColumn(col.id);
+      cards = cards.filter((card) => card.column !== col.id);
+      setState(cards);
+      el.remove();
+      renderForms();
+      initDropZones();
+      render();
+    });
+    titleWrap.appendChild(deleteBtn);
+  }
+
+  el.appendChild(titleWrap);
+
+  const formWrap = document.createElement('div');
+  formWrap.className = 'column__form';
+  formWrap.setAttribute('data-form', col.id);
+  el.appendChild(formWrap);
+
+  const cardsWrap = document.createElement('div');
+  cardsWrap.className = 'column__cards';
+  cardsWrap.setAttribute('data-cards', col.id);
+  el.appendChild(cardsWrap);
+
   board.appendChild(el);
 }
 

@@ -112,3 +112,13 @@ export function addCustomColumn(label) {
 export function clearCustomColumns() {
   localStorage.removeItem(COLUMNS_KEY);
 }
+
+export function deleteCustomColumn(id) {
+  const cols = (getCustomColumns() || []).filter((col) => col && col.id !== id);
+  if (cols.length === 0) {
+    localStorage.removeItem(COLUMNS_KEY);
+    return [];
+  }
+  setCustomColumns(cols);
+  return cols;
+}
