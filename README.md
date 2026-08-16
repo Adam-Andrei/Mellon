@@ -5,5 +5,5 @@ Kanban app no login required
 
 How to use copy
 <img width="736" height="88" alt="image" src="https://github.com/user-attachments/assets/2fa83e2a-a084-4811-97d8-c374bda98c66" />
-just copy the no need for the link WIP will fix that later
+just copy this part
 ?b=H4sIAAAAAAAA...
